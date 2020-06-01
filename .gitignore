@@ -1,0 +1,16 @@
+/out/
+/public/js/
+/target/
+/*-init.clj
+/*.log
+
+# Leiningen
+/.lein-*
+/.nrepl-port
+
+# Node.js dependencies
+/node_modules/
+
+# shadow-cljs cache, port files
+# /shadow-cljs.edn # using shadow as the build tool, so need the config.
+/.shadow-cljs/

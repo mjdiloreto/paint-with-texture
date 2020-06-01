@@ -1,0 +1,22 @@
+* Shadow-reagent
+A minimal setup for running reagent apps using shadow-cljs.
+
+Setup adapted from [[https://www.manueluberti.eu/programming/2018/11/14/deps-shadow-cljs/][this post.]]
+
+** Cider setup
+If it can't be used inside Emacs it's totally useless.
+
+1. Run =npx shadow-cljs watch frontend= in terminal
+2. Run cider-connect-cljs =C-c M-C)= in Emacs.
+3. Open index.html in browser.
+   
+OR
+
+1. Run cider-jack-in-cljs =C-c M-J=.
+2. Select =shadow= as the repl type.
+3. Select =:app= as the build.
+
+** compile and distribute
+- compile - =npx shadow-cljs compile frontend=
+- distribute - =npx shadow-cljs release frontend=
+
