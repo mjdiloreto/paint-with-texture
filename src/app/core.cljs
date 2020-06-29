@@ -13,11 +13,14 @@
   []
   (let
       [texture (.thicker (.lines textures))
-       example-svg-elt (.select d3-selection "#example")]
+       example-svg-elt (-> d3-selection (.select "#app") (.append "svg"))]
     (do (.call example-svg-elt texture)
-        (.style (.append example-svg-elt "circle")
-                "fill"
-                (.url texture))
+        (-> example-svg-elt
+            (.append "circle")
+            (.attr "cx" 30)
+            (.attr "cy" 30)
+            (.attr "r" 20)
+            (.style "fill" (.url texture)))
         [:div "hello world"]
         #_(start))))
 
