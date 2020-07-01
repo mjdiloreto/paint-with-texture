@@ -9,18 +9,36 @@
   []
   (rdom/render [views/simpler] (.getElementById js/document "app")))
 
+(defn add-textured-circle-to-svg
+  [svg-elt texture]
+  (-> svg-elt
+      (.append "circle")
+      (.attr "cx" 30)
+      (.attr "cy" 30)
+      (.attr "r" 20)
+      (.style "fill" (.url texture))))
+
+(defn add-textured-square-to-svg
+  [svg-elt texture]
+  (-> svg-elt
+      (.append "rect")
+      (.attr "width" 30)
+      (.attr "height" 30)
+      (.style "fill" (.url texture))))
+
+(defn setup-svg-grid
+  [height width starting-texture]
+  (doseq [h (range height)
+          w (range width)]
+    (let [tile (-> d3-selection (.select "#app") (.append "svg") (.attr "width" 30) (.attr "height" 30))
+          _ (.call tile starting-texture)]
+      (add-textured-square-to-svg tile starting-texture))))
+
 (defn ^:export main
   []
   (let
       [texture (.thicker (.lines textures))
-       example-svg-elt (-> d3-selection (.select "#app") (.append "svg"))]
-    (do (.call example-svg-elt texture)
-        (-> example-svg-elt
-            (.append "circle")
-            (.attr "cx" 30)
-            (.attr "cy" 30)
-            (.attr "r" 20)
-            (.style "fill" (.url texture)))
-        [:div "hello world"]
-        #_(start))))
+       texture2 (.thinner (.lines textures))]
+    (setup-svg-grid 5 5 texture))
+  #_(start))
 

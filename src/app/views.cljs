@@ -1,15 +1,16 @@
 (ns app.views
-  (:require [reagent.core :refer [atom]]
+  (:require [reagent.core :as r]
+            [reagent.dom :as rdom]
             [textures]
             [d3-selection]
             [app.state :refer [app-state]]
             [app.events :refer [increment decrement]]))
 
-(def w (atom 10))
+(def w (r/atom 10))
 (defn swap-w [e] (swap! w #(.-value (.-target e))))
-(def h (atom 10))
+(def h (r/atom 10))
 (defn swap-h [e] (swap! h #(.-value (.-target e))))
-(def state (atom {}))
+(def state (r/atom {}))
 
 (defn pixel-state [x y] (get-in @state [x y]))
 (defn swap-pixel [x y val] (swap! state assoc [x y] val))
@@ -52,8 +53,59 @@
    [height-slider @h]])
 
 
+(defn simple-circle
+  []
+  [:circle {:cx 30 :cy 30 :r 30 :fill "red"}])
+
+(defn textured-circle-svg
+  []
+  (r/with-let [texture (.thicker (.lines textures))
+               this-node (r/current-component) ;(rdom/dom-node)
+               _ (.call this-node texture)]
+    [:svg
+     [:circle {:cx 30 :cy 30 :r 30 :fill "blue" #_(.url texture)}]]))
+
+(defn wrap-circle-with-texture
+  [svg-elt circle-elt]
+  (let [texture (.thicker (.lines textures))
+        selected-circle (-> d3-selection (.select circle-elt))
+        selected-svg (-> d3-selection (.select svg-elt))]
+    (.call selected-svg texture)
+    (.style selected-circle "fill" (.url texture))
+    (.append selected-svg selected-circle)
+    selected-svg))
+
+(comment
+  (wrap-circle-with-texture [:svg] (simple-circle)))
+
+;; https://stackoverflow.com/questions/39831137/force-reagent-component-to-update-on-window-resize
+(defn get-client-rect [node]
+  (let [r (.getBoundingClientRect node)]
+    {:left (.-left r), :top (.-top r) :right (.-right r) :bottom (.-bottom r) :width (.-width r) :height (.-height r)}))
+
+(defn size-comp []
+  (r/with-let [size (r/atom nil)
+               this (r/current-component)
+               handler #(reset! size (get-client-rect (rdom/dom-node this)))
+               _ (.addEventListener js/window "resize" handler)]
+    [:div "new size " @size]
+    (finally (.removeEventListener js/window "resize" handler))))
 
 (defn simpler
   []
-  )
+  [:div
+   [size-comp]
+   [:svg (simple-circle)]
+   [textured-circle-svg]])
 
+(comment
+  (let
+      [texture (.thicker (.lines textures))
+       example-svg-elt (-> d3-selection (.select "#app") (.append "svg"))]
+    (.call example-svg-elt texture)
+    (-> [:svg {:id "thisexample"}]
+        (.append "circle")
+        (.attr "cx" 30)
+        (.attr "cy" 30)
+        (.attr "r" 20)
+        (.style "fill" (.url texture)))))
