@@ -31,14 +31,15 @@
   (doseq [h (range height)
           w (range width)]
     (let [tile (-> d3-selection (.select "#app") (.append "svg") (.attr "width" 30) (.attr "height" 30))
+          _ (js/console.log tile)
           _ (.call tile starting-texture)]
       (add-textured-square-to-svg tile starting-texture))))
 
 (defn ^:export main
   []
-  (let
+  #_(let
       [texture (.thicker (.lines textures))
        texture2 (.thinner (.lines textures))]
     (setup-svg-grid 5 5 texture))
-  #_(start))
+  (start))
 

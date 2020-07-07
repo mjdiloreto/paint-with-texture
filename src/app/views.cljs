@@ -91,12 +91,42 @@
     [:div "new size " @size]
     (finally (.removeEventListener js/window "resize" handler))))
 
+(defn i-show-my-size []
+  (let [size (r/atom nil)]
+    (r/create-class {:component-will-mount
+                     (fn [this]
+                       (set! (.-onresize js/window)
+                             (r/force-update this)))
+                     :reagent-render
+                     (fn []
+                       [:div {:ref #(when % (reset! size (let [bb (.getBoundingClientRect %)]
+                                                           [(.-width bb) (.-height bb)])))}
+                        (prn-str @size)])})))
+
+(defn texture-svg
+  [w h texture]
+  (r/create-class {:reagent-render
+                   (fn []
+                     [:svg {:width w :height h :ref #(when % (.call (-> d3-selection (.select %)) texture))}
+                      [:rect {:width w :height h :style {:fill (.url texture)}}]])}))
+
+(defn texture-grid
+  [rows columns texture]
+  (let [no-space {:border "none" :border-collapse "collapse" :cell-spacing 0 :padding 0 :margin 0}]
+    [:table {:style no-space}
+     [:tbody
+      (for [x (range rows)]
+        ^{:key x} [:tr {:style no-space}
+         (for [y (range columns)]
+           ^{:key y} [:td {:style no-space} [texture-svg 30 30 texture]])])]]))
+
 (defn simpler
   []
-  [:div
-   [size-comp]
-   [:svg (simple-circle)]
-   [textured-circle-svg]])
+  (let [t (.thicker (.lines textures))]
+    [texture-grid 5 5 t])
+  #_[:div
+   [simple-svg 30 30]
+   [i-show-my-size]])
 
 (comment
   (let
