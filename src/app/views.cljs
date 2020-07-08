@@ -6,23 +6,23 @@
             [app.state :refer [app-state]]
             [app.events :refer [increment decrement]]))
 
-(defn texture-svg
-  [w h texture]
-  (r/create-class {:reagent-render
-                   (fn []
-                     [:svg {:width w :height h :ref #(when % (.call (-> d3-selection (.select %)) texture))}
-                      [:rect {:width w :height h :style {:fill (.url texture)}}]])}))
-
-
-
-(def tex1 (.thicker (.lines textures)))
-(def tex2 (.thinner (.lines textures)))
-
 (def app-state
   (r/atom {:painting false
            :cells {2 {2 true}}
            :width 15
            :height 15}))
+
+(def tex1 (.thicker (.lines textures)))
+(def tex2 (.thinner (.lines textures)))
+
+(defn texture-svg
+  [w h x y]
+  (r/create-class {:reagent-render
+                   (fn []
+                     (let [svg-state (get-in @app-state [:cells x y])
+                           texture (if svg-state tex1 tex2)]
+                       [:svg {:width w :height h :ref #(when % (.call (-> d3-selection (.select %)) texture))}
+                        [:rect {:width w :height h :style {:fill (.url texture)}}]]))}))
 
 (defn texture-cell
   [x y]
@@ -32,7 +32,7 @@
             (do
               (swap! app-state update-in [:cells x y] (constantly true)))))
         :style {:border "none" :border-collapse "collapse" :line-height 0 :cell-spacing 0 :padding 0 :margin 0}}
-   [texture-svg 30 30 (if (get-in @app-state [:cells x y]) tex1 tex2)]])
+   [texture-svg 30 30 x y]])
 
 (defn texture-grid
   []
