@@ -1,5 +1,5 @@
-* Shadow-reagent
-A minimal setup for running reagent apps using shadow-cljs.
+* Paint With Texture! (WIP)
+A simple application to paint a grid with textures from [[https://riccardoscalco.it/textures/][Textures.js]]
 
 Setup adapted from [[https://www.manueluberti.eu/programming/2018/11/14/deps-shadow-cljs/][this post.]]
 
@@ -19,4 +19,9 @@ OR
 ** compile and distribute
 - compile - =npx shadow-cljs compile frontend=
 - distribute - =npx shadow-cljs release frontend=
+
+** NOTES
+Cannot find nice automated way to get Cider to cooperate, the manual setup in repl in this issue works.
+TODO: Find a way to automate this.
+https://github.com/clojure-emacs/cider/issues/2812
 
